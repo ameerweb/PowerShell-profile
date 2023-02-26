@@ -4,7 +4,6 @@ Import-Module posh-git
 Import-Module oh-my-posh
 Set-PoshPrompt Parado
 
-
 oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\craver.omp.json' | Invoke-Expression
 
 # Alias
