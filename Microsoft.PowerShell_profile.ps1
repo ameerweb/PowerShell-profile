@@ -1,25 +1,47 @@
 Invoke-Expression (&starship init powershell)
 Import-Module Terminal-Icons
 Import-Module posh-git
-Import-Module oh-my-posh
-Set-PoshPrompt Parado
+# Set-Theme Paradox
+# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+$env:POSH_GIT_ENABLED = $true
+oh-my-posh --init --shell pwsh --config 'C:\Users\ameer\ps_themes\custom\montys.omp.json' | Invoke-Expression
 
-oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\craver.omp.json' | Invoke-Expression
+# PSReadLine 
+Set-PSReadLineOption -EditMode Emacs
+Set-PSReadLineOption -BellStyle None
+Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
+Set-PSReadLineOption -PredictionSource History
+
+#Fzf
+Import-Module PSFzf 
+Set-PSFzfOption -PSReadlLineChordProvider 'Ctrl+f' -PSReadLineChordReverseHistory 'Ctrl+r'
 
 # Alias
 New-Alias c clear
 New-Alias vim nvim
 New-Alias ll ls
+New-Alias tig 'C:\Program Files\Git\usr\bin\tig.exe'
+New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
+New-Alias pn pnpm
+
+#utitlties 
+function which ($command) {
+	Get-Command -Name $command -ErrorAction SilentlyContinue |
+		Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+	}
 
 # name an welcoming 
-$usr = (Get-ChildItem Env:\USERNAME).value
-$time = Get-Date -Format "HH:mm"
-$date = Get-Date -Format "dd-MM-yyyy"
+# $usr = (Get-ChildItem Env:\USERNAME).value
+# $time = Get-Date -Format "HH:mm"
+# $date = Get-Date -Format "dd-MM-yyyy"
 
-Clear-Host
-Write-Output "PowerShell 7.3.2"
-Write-Output "Hi $usr its $time ---- date is: $date"
-
+#Clear-Host
+# Write-Output "PowerShell 7.3.2"
+# Write-Output "Hi $usr its $time ---- date is: $date"
+function lh { ls -ah}
+function ~ {cd ~}
+function d {cd c:\users\ameer\Desktop }
+function dd { cd C:\Users\ameer\Documents\ }
 function run_odoo16 {
 	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin -c D:\odoo\odoo-16\odoo.conf $args
 };
@@ -52,5 +74,58 @@ function fix_odoo16_port {
 	}
 	else {
 		Write-Output "There is no process using port (8016) of odoo"
+	}
+}
+
+
+function pull_odoo_11 {
+	Write-Output "================odoo-11================" -ForegroundColor cyan
+	git --git-dir=D:\odoo\odoo-11\.git pull
+}
+function pull_odoo_12 {
+	Write-Output "================odoo-12================"
+	git --git-dir=D:\odoo\odoo-12\.git pull
+}
+function pull_odoo_13 {
+	Write-Output "================odoo-13================"
+	git --git-dir=D:\odoo\odoo-13\.git pull
+}
+function pull_odoo_14 {
+	Write-Output "================odoo-14================"
+	git --git-dir=D:\odoo\odoo-14\.git pull
+}
+function pull_odoo_15 {
+	Write-Output "================odoo-15================"
+	git --git-dir=D:\odoo\odoo-15\.git pull
+}
+function pull_odoo_16 {
+	Write-Output "================odoo-16================"
+	git --git-dir=D:\odoo\odoo-16\.git pull
+}
+function pull_odoo_master {
+	Write-Output "================odoo-master================"
+	git --git-dir=D:\odoo\odoo-master\.git pull
+}
+function pull_odoo_all {
+	$connection = Test-NetConnection -WarningAction SilentlyContinue
+	if ($connection.PingSucceeded) {
+		
+		<# Action to perform if the condition is true #>
+		pull_odoo_11;
+	
+		pull_odoo_12;
+	
+		pull_odoo_13;
+	
+		pull_odoo_14;
+	
+		pull_odoo_15;
+	
+		pull_odoo_16;
+	
+		pull_odoo_master;
+	}
+	else {
+		Write-Output "Please Check Your Internet Connection"
 	}
 }
