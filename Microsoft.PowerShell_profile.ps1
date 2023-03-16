@@ -12,7 +12,7 @@ Set-PSReadLineOption -BellStyle None
 Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
 Set-PSReadLineOption -PredictionSource History
 
-oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\craver.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\montys.omp.json' | Invoke-Expression
 
 # Alias
 New-Alias c clear
