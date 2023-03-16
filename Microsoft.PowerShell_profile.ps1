@@ -12,9 +12,7 @@ Set-PSReadLineOption -BellStyle None
 Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
 Set-PSReadLineOption -PredictionSource History
 
-#Fzf
-Import-Module PSFzf 
-Set-PSFzfOption -PSReadlLineChordProvider 'Ctrl+f' -PSReadLineChordReverseHistory 'Ctrl+r'
+oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\craver.omp.json' | Invoke-Expression
 
 # Alias
 New-Alias c clear
