@@ -25,8 +25,8 @@ New-Alias pn pnpm
 #utitlties 
 function which ($command) {
 	Get-Command -Name $command -ErrorAction SilentlyContinue |
-		Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
-	}
+	Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+}
 
 # name an welcoming 
 # $usr = (Get-ChildItem Env:\USERNAME).value
@@ -36,10 +36,22 @@ function which ($command) {
 #Clear-Host
 # Write-Output "PowerShell 7.3.2"
 # Write-Output "Hi $usr its $time ---- date is: $date"
-function lh { ls -ah}
-function ~ {cd ~}
-function d {cd c:\users\ameer\Desktop }
-function dd { cd C:\Users\ameer\Documents\ }
+function lh { Get-ChildItem -ah }
+function ~ { Set-Location ~ }
+function d { Set-Location c:\users\ameer\Desktop }
+function dd { Set-Location C:\Users\ameer\Documents\ }
+function ip {
+	$connection = Test-NetConnection
+	if ($connection.PingSucceeded) {
+		$ip = $connection.SourceAddress.IPAddress
+		Set-Clipboard -Value $ip
+		Write-Output "Connectd Ip Address is $ip has copied to clipboard"
+	}
+	else {
+		Write-Host "No Internet Connection"
+	}
+	
+}
 function run_odoo16 {
 	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin -c D:\odoo\odoo-16\odoo.conf $args
 };
@@ -107,8 +119,7 @@ function pull_odoo_master {
 function pull_odoo_all {
 	$connection = Test-NetConnection -WarningAction SilentlyContinue
 	if ($connection.PingSucceeded) {
-		
-		<# Action to perform if the condition is true #>
+
 		pull_odoo_11;
 	
 		pull_odoo_12;
