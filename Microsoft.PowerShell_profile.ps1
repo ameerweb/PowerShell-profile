@@ -41,14 +41,14 @@ function ~ { Set-Location ~ }
 function d { Set-Location c:\users\ameer\Desktop }
 function dd { Set-Location C:\Users\ameer\Documents\ }
 function ip {
-	$connection = Test-NetConnection
-	if ($connection.PingSucceeded) {
-		$ip = $connection.SourceAddress.IPAddress
-		Set-Clipboard -Value $ip
-		Write-Output "Connectd Ip Address is $ip has copied to clipboard"
+	$connection = Test-NetConnection -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+	$ip = $connection.SourceAddress.IPAddress
+	if ($null -eq $ip -or $ip -eq "") {
+		Write-Host "Not Connected"
 	}
 	else {
-		Write-Host "No Internet Connection"
+		Set-Clipboard -Value $ip
+		Write-Output "Connectd Ip Address is $ip has copied to clipboard"
 	}
 	
 }
