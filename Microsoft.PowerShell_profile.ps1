@@ -52,6 +52,18 @@ function ip {
 	}
 	
 }
+
+# another function
+function ip2 {
+	$connection = Get-NetIPAddress | Where-Object { ($_.InterfaceIndex -eq 28) -and ($_.InterfaceAlias -eq 'Wi-Fi') } | Select-Object IPAddress | findstr 192.168.1.*
+	if (-Not $connection) {
+		Write-Host "Not Found"
+	}
+	else {
+		Set-Clipboard -Value $connection
+		Write-Output "Connectd Ip Address is $connection has copied to clipboard"
+	}
+}
 function run_odoo16 {
 	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin -c D:\odoo\odoo-16\odoo.conf $args
 };
