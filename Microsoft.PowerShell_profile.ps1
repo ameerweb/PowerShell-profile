@@ -1,10 +1,7 @@
 Invoke-Expression (&starship init powershell)
 Import-Module Terminal-Icons
 Import-Module posh-git
-# Set-Theme Paradox
-# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 $env:POSH_GIT_ENABLED = $true
-oh-my-posh --init --shell pwsh --config 'C:\Users\ameer\ps_themes\custom\montys.omp.json' | Invoke-Expression
 
 # PSReadLine 
 Set-PSReadLineOption -EditMode Emacs
@@ -12,6 +9,7 @@ Set-PSReadLineOption -BellStyle None
 Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
 Set-PSReadLineOption -PredictionSource History
 
+# oh-my-posh:
 oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\montys.omp.json' | Invoke-Expression
 
 # Alias
@@ -28,15 +26,6 @@ function which ($command) {
 	Get-Command -Name $command -ErrorAction SilentlyContinue |
 	Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
 }
-
-# name an welcoming 
-# $usr = (Get-ChildItem Env:\USERNAME).value
-# $time = Get-Date -Format "HH:mm"
-# $date = Get-Date -Format "dd-MM-yyyy"
-
-#Clear-Host
-# Write-Output "PowerShell 7.3.2"
-# Write-Output "Hi $usr its $time ---- date is: $date"
 function lh { Get-ChildItem -ah }
 function ~ { Set-Location ~ }
 function d { Set-Location c:\users\ameer\Desktop }
@@ -67,26 +56,70 @@ function ipw {
 		Write-Output "Connectd Ip Address is $connection has copied to clipboard"
 	}
 }
-function run_odoo16 {
-	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin -c D:\odoo\odoo-16\odoo.conf $args
-};
-function run_odoo16sh {
-	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin shell
-};
-function run_odoo15 {
-	&"D:\odoo\odoo-15\venv-odoo15\Scripts\python.exe" D:\odoo\odoo-15\odoo-bin -c D:\odoo\odoo-15\odoo.conf $args
-};
-function run_odoo14 {
-	&"D:\odoo\odoo-14\venv-odoo14\Scripts\python.exe" D:\odoo\odoo-14\odoo-bin -c D:\odoo\odoo-14\odoo.conf $args
-};
-function run_odoo11 {
-	&"D:\odoo\odoo-11\venv-odoo11\Scripts\python.exe" D:\odoo\odoo-11\odoo-bin -c D:\odoo\odoo-11\odoo.conf $args
-};
-function run_odoo_master {
-	&"D:\odoo\odoo-master\venv-odoomaster\Scripts\python.exe" D:\odoo\odoo-master\odoo-bin -c D:\odoo\odoo-master\odoo.conf
+
+# Odoo configuration :
+function scaffold {
+	param(
+		[Parameter()]
+		[Int64]$odoo_version,
+		[Parameter()]
+		[string]$module_name)
+
+	try {
+		&"D:\odoo\odoo-$odoo_version\venv-odoo$odoo_version\Scripts\python.exe" D:\odoo\odoo-$odoo_version\odoo-bin scaffold $module_name D:\odoo\odoo-$odoo_version\custom-addons
+		$folder = "D:\odoo\odoo-$odoo_version\custom-addons\" + $module_name
+		if (Test-Path -Path $folder) {
+			Write-Host "Module $module_name created seccessfully in odoo v$odoo_version"
+		}
+	}
+	catch {
+		Write-Host "Something wentwrong"
+	}
+	
 }
-function fix_odoo16_port {
-	$netstate = netstat -ano | findStr "8016"
+function pull_odoo {
+	param(
+		[Parameter()]
+		[string]$odoo_version)
+
+
+	if (($odoo_version -ne "") -and ($null -ne $odoo_version)) {
+		Write-Output "================odoo-$odoo_version================"
+		git --git-dir=D:\odoo\odoo-$odoo_version\.git pull
+	}
+	else {
+		Write-Output "No odoo version set"
+	}
+}
+function uninstall_odoo {
+	param(
+		[Parameter(HelpMessage = "odoo version")]
+		[Int64]$odoo_version,
+		[Parameter()]
+		[string]$dbname,
+		[Parameter()]
+		[string]$module_name)
+		
+
+	try {
+		&"D:\odoo\odoo-$odoo_version\venv-odoo$odoo_version\Scripts\python.exe" D:\odoo\odoo-$odoo_version\odoo-bin shell -d $dbname --addons-path=D:\odoo\odoo-$odoo_version\custom-addons
+		Write-Host "An uninstallation command has copied to clipboard please past it to the python command shell bellow"
+		Set-Clipboard "self.env['ir.module.module'].search([('name', '=', '$module_name')]).button_immediate_uninstall()"
+	}
+	catch {
+		Write-Host "Something wentwrong"
+	}
+	
+}
+function fix_odoo {
+	#TODO: This function need to be fixed
+	param(
+		[Parameter()]
+		[Int64]$odoo_version)
+		
+	$port = "80$odoo_version"
+
+	$netstate = netstat -ano | findStr $port
 	
 	if ($netstate.count -gt 0) {
 		foreach ($result in $netstate) {
@@ -101,77 +134,32 @@ function fix_odoo16_port {
 		Write-Output "There is no process using port (8016) of odoo"
 	}
 }
-
-
-function pull_odoo_11 {
-	Write-Output "================odoo-11================"
-	git --git-dir=D:\odoo\odoo-11\.git pull
-}
-function pull_odoo_12 {
-	Write-Output "================odoo-12================"
-	git --git-dir=D:\odoo\odoo-12\.git pull
-}
-function pull_odoo_13 {
-	Write-Output "================odoo-13================"
-	git --git-dir=D:\odoo\odoo-13\.git pull
-}
-function pull_odoo_14 {
-	Write-Output "================odoo-14================"
-	git --git-dir=D:\odoo\odoo-14\.git pull
-}
-function pull_odoo_15 {
-	Write-Output "================odoo-15================"
-	git --git-dir=D:\odoo\odoo-15\.git pull
-}
-function pull_odoo_16 {
-	Write-Output "================odoo-16================"
-	git --git-dir=D:\odoo\odoo-16\.git pull
-}
-function pull_odoo_master {
-	Write-Output "================odoo-master================"
-	git --git-dir=D:\odoo\odoo-master\.git pull
-}
-function pull_odoo_all {
-	$connection = Test-NetConnection -WarningAction SilentlyContinue
-	if ($connection.PingSucceeded) {
-
-		pull_odoo_11;
-	
-		pull_odoo_12;
-	
-		pull_odoo_13;
-	
-		pull_odoo_14;
-	
-		pull_odoo_15;
-	
-		pull_odoo_16;
-	
-		pull_odoo_master;
+function run_odoo {
+	try {
+		if ($args.Length -eq 1) {
+			&"D:\odoo\odoo-$args\venv-odoo$args\Scripts\python.exe" D:\odoo\odoo-$args\odoo-bin --c D:\odoo\odoo-$args\odoo.conf
+		}
+		elseif ($args.Length -gt 1) {
+			$odoo_version = $args[0]
+			$kwargs = $args[1..($args.Length - 1)]
+			&"D:\odoo\odoo-$odoo_version\venv-odoo$odoo_version\Scripts\python.exe" D:\odoo\odoo-$odoo_version\odoo-bin -c D:\odoo\odoo-$odoo_version\odoo.conf $kwargs
+		}
+		else {
+			Write-Host "enter the odoo version number followed by any anrguments you wnat"
+		}	
 	}
-	else {
-		Write-Output "Please Check Your Internet Connection"
+	catch {
+		Write-Host "Not Fount"
 	}
-}
-function ip16 {
+};
+function ip_odoo {
+	param(
+		[Parameter()]
+		[Int64]$odoo_version)
+
 	$ip = ip;
-	$link = "http://" + $ip + ":8016"
+	$link = "http://" + $ip + ":80$odoo_version"
 
 	Write-Output "the link is ==> $link"
 	Set-Clipboard -Value $link
 }
-
-function scaffold16 () {
-	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin scaffold $args D:\odoo\odoo-16\custom-addons
-	$folder = "D:\odoo\odoo-16\custom-addons\" + $args
-	if (Test-Path -Path $folder) {
-		"Successfully created"
-	}
- else {
-		"Something wrong please check the confguration"
-	}
-}
-
-# TODO: Group all odoo function inside only one
-# TODO: python3 odoo-bin shell -d mydb --addons-path=/your/addons/path
-# TODO: self.env['ir.module.module'].search([('name', '=', 'crm')]).button_immediate_uninstall()
