@@ -48,14 +48,16 @@ function ip {
 	}
 	else {
 		Set-Clipboard -Value $ip
-		Write-Output "Connectd Ip Address is $ip has copied to clipboard"
+		return $ip
 	}
 	
 }
 
 # another function
-function ip2 {
-	$connection = Get-NetIPAddress | Where-Object { ($_.InterfaceIndex -eq 28) -and ($_.InterfaceAlias -eq 'Wi-Fi') } | Select-Object IPAddress | findstr 192.168.1.*
+function ipw {
+	$connection = Get-NetIPAddress | Where-Object { ($_.InterfaceIndex -eq 28) -and ($_.InterfaceAlias -eq 'Wi-Fi') } | Select-Object IPAddress | findstr 192*
+	# TODO: try this way later
+	#  (Find-NetRoute -RemoteIPAddress 0.0.0.0).IPAddress
 	if (-Not $connection) {
 		Write-Host "Not Found"
 	}
@@ -150,3 +152,10 @@ function pull_odoo_all {
 		Write-Output "Please Check Your Internet Connection"
 	}
 }
+function ip16 {
+	$ip = ip;
+	$link = "http://" + $ip + ":8016"
+
+	Write-Output "the link is ==> $link"
+		Set-Clipboard -Value $link
+	}
