@@ -103,7 +103,7 @@ function fix_odoo16_port {
 
 
 function pull_odoo_11 {
-	Write-Output "================odoo-11================" -ForegroundColor cyan
+	Write-Output "================odoo-11================"
 	git --git-dir=D:\odoo\odoo-11\.git pull
 }
 function pull_odoo_12 {
@@ -157,5 +157,18 @@ function ip16 {
 	$link = "http://" + $ip + ":8016"
 
 	Write-Output "the link is ==> $link"
-		Set-Clipboard -Value $link
+	Set-Clipboard -Value $link
+}
+
+function scaffold16 () {
+	&"D:\odoo\odoo-16\venv-odoo16\Scripts\python.exe" D:\odoo\odoo-16\odoo-bin scaffold $args D:\odoo\odoo-16\custom-addons
+	$folder = "D:\odoo\odoo-16\custom-addons\" + $args
+	if (Test-Path -Path $folder) {
+		"Successfully created"
 	}
+ else {
+		"Something wrong please check the confguration"
+	}
+}
+
+# TODO: Group all odoo function inside only one
