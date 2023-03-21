@@ -21,6 +21,7 @@ New-Alias ll ls
 New-Alias tig 'C:\Program Files\Git\usr\bin\tig.exe'
 New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
 New-Alias pn pnpm
+New-Alias grep findstr
 
 #utitlties 
 function which ($command) {
