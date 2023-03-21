@@ -93,7 +93,7 @@ function fix_odoo16_port {
 			$splitArray = $result -split " "
 			$procID = $splitArray[$splitArray.length - 1]
 			$procName = Get-Process | Where-Object Id -EQ $procID | Select-Object -Expand ProcessName
-			Stop-Process $procID
+			Stop-Process $procID -Force
 			Write-Output "Process $procName with id $procID is killed"
 		}
 	}
@@ -173,3 +173,5 @@ function scaffold16 () {
 }
 
 # TODO: Group all odoo function inside only one
+# TODO: python3 odoo-bin shell -d mydb --addons-path=/your/addons/path
+# TODO: self.env['ir.module.module'].search([('name', '=', 'crm')]).button_immediate_uninstall()
