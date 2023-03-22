@@ -59,6 +59,9 @@ function ipw {
 
 # Odoo configuration :
 function scaffold {
+	<#
+	This is a simplify for odoo scaffold commands.
+	#>
 	param(
 		[Parameter()]
 		[Int64]$odoo_version,
@@ -78,6 +81,9 @@ function scaffold {
 	
 }
 function pull_odoo {
+	<#
+	This function is to pull the code uodates from github.
+	#>
 	param(
 		[Parameter()]
 		[string]$odoo_version)
@@ -92,6 +98,10 @@ function pull_odoo {
 	}
 }
 function uninstall_odoo {
+	<#
+	This function is to uninstall odoo module from command becouse there is no officail way in docummentation to do this
+	#>
+	# TODO: Future update : use odoorpc may be helpfull.
 	param(
 		[Parameter(HelpMessage = "odoo version")]
 		[Int64]$odoo_version,
@@ -112,6 +122,9 @@ function uninstall_odoo {
 	
 }
 function fix_odoo {
+	<#
+	This function is to fix the port if it used by another service
+	#>
 	#TODO: This function need to be fixed
 	param(
 		[Parameter()]
@@ -126,7 +139,7 @@ function fix_odoo {
 			$splitArray = $result -split " "
 			$procID = $splitArray[$splitArray.length - 1]
 			$procName = Get-Process | Where-Object Id -EQ $procID | Select-Object -Expand ProcessName
-			Stop-Process $procID -Force
+			Stop-Process $procID -Force -ErrorAction SilentlyContinue
 			Write-Output "Process $procName with id $procID is killed"
 		}
 	}
@@ -135,6 +148,9 @@ function fix_odoo {
 	}
 }
 function run_odoo {
+	<#
+	This function is to run odoo directly from command prompt.
+	#>
 	try {
 		if ($args.Length -eq 1) {
 			&"D:\odoo\odoo-$args\venv-odoo$args\Scripts\python.exe" D:\odoo\odoo-$args\odoo-bin --c D:\odoo\odoo-$args\odoo.conf
@@ -153,6 +169,10 @@ function run_odoo {
 	}
 };
 function ip_odoo {
+	<#
+	This function is to get the link to access odoo localy from local network,
+	for example if you want to let teammates to test module in your local machine.
+	#>
 	param(
 		[Parameter()]
 		[Int64]$odoo_version)
