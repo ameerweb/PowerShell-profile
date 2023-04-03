@@ -173,6 +173,9 @@ function ip_odoo {
 	This function is to get the link to access odoo localy from local network,
 	for example if you want to let teammates to test module in your local machine.
 	#>
+	
+	# TODO: Firewall port management if not enabled.
+	
 	param(
 		[Parameter()]
 		[Int64]$odoo_version)
