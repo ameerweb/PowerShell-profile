@@ -30,32 +30,6 @@ function lh { Get-ChildItem -ah }
 function ~ { Set-Location ~ }
 function d { Set-Location c:\users\ameer\Desktop }
 function dd { Set-Location C:\Users\ameer\Documents\ }
-function ip {
-	$connection = Test-NetConnection -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-	$ip = $connection.SourceAddress.IPAddress
-	if ($null -eq $ip -or $ip -eq "") {
-		Write-Host "Not Connected"
-	}
-	else {
-		Set-Clipboard -Value $ip
-		return $ip
-	}
-	
-}
-
-# another function
-function ipw {
-	$connection = Get-NetIPAddress | Where-Object { ($_.InterfaceIndex -eq 28) -and ($_.InterfaceAlias -eq 'Wi-Fi') } | Select-Object IPAddress | findstr 192*
-	# TODO: try this way later
-	#  (Find-NetRoute -RemoteIPAddress 0.0.0.0).IPAddress
-	if (-Not $connection) {
-		Write-Host "Not Found"
-	}
-	else {
-		Set-Clipboard -Value $connection
-		Write-Output "Connectd Ip Address is $connection has copied to clipboard"
-	}
-}
 
 # Odoo configuration :
 function scaffold {
@@ -176,10 +150,16 @@ function ip_odoo {
 	param(
 		[Parameter()]
 		[Int64]$odoo_version)
-
-	$ip = ip;
-	$link = "http://" + $ip + ":80$odoo_version"
-
-	Write-Output "the link is ==> $link"
-	Set-Clipboard -Value $link
+	$ipaddress = (Find-NetRoute -RemoteIPAddress 0.0.0.0).IPAddress
+	Write-Host $x
+	if ($ipaddress) {
+		New-NetFirewallRule -DisplayName "Odoo $odoo_version Local" -Profile 'Private' -Direction Inbound -Action Allow -Protocol TCP -LocalPort 80$odoo_version | Out-Null
+		$link = "http://" + $ipaddress[0] + ":80$odoo_version"
+		Write-Output "the link is ==> $link is copied to clipboard"
+		Set-Clipboard -Value $link
+	}
+	else {
+		Write-Host "Not Connected"
+	}
+	
 }
