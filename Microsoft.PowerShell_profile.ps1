@@ -20,6 +20,7 @@ New-Alias tig 'C:\Program Files\Git\usr\bin\tig.exe'
 New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
 New-Alias pn pnpm
 New-Alias grep findstr
+New-Alias wls Microsoft.PowerShell.Core\FileSystem::\\wsl.localhost\Debian
 
 #utitlties 
 function which ($command) {
@@ -165,4 +166,18 @@ function ip_odoo {
 		Write-Host "Not Connected"
 	}
 	
+}
+
+function setIcon() {
+	
+	Set-Content -Path 'desktop.ini' -Value @"
+[.ShellClassInfo]
+ConfirmFileOp=0
+NoSharing=0
+IconFile=icon.ico
+IconIndex=0
+FolderType=Videos
+"@
+	attrib +s +h 'desktop.ini'
+
 }
