@@ -99,6 +99,10 @@ function uninstall_odoo {
 function fix_odoo {
 	<#
 	This function is to fix the port if it used by another service
+	if windows OSERROR access persmisions although the port not used. the follwong commands will be helpfull
+
+		#net stop winnat
+		#net start winnat
 	#>
 	#TODO: This function need to be fixed
 	param(
