@@ -32,7 +32,60 @@ function ~ { Set-Location ~ }
 function d { Set-Location c:\users\ameer\Desktop }
 function dd { Set-Location C:\Users\ameer\Documents\ }
 
-# Odoo configuration :
+##################################
+####    --  CONFIG FILE  --  #####
+##################################
+$configFile = "C:\Users\ameer\Documents\MEGAsync\Powershell\config.json"
+
+<#
+This Function is used to add any custom key value to $configFile key value, So i can permanent save them to use them later.
+usage: Add-Config -key 'key1' -value "Any Value" 
+#>
+function Add-Config {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$Key,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$Value
+    )
+
+    if (Test-Path -Path $configFile -PathType Leaf) {
+        # Read the JSON content
+        try {
+            $jsonContent = Get-Content $configFile | Out-String | ConvertFrom-Json
+            $jsonContent | Add-Member -Type NoteProperty -Name $Key -Value $Value
+            $jsonContent | ConvertTo-Json | Set-Content $configFile
+        }
+        catch {
+            Write-Error "Error reading JSON file: $($_.Exception.Message)"
+            exit 1
+        }
+    }
+    else {
+        Write-Host "No JSON File Found"
+    }
+}
+
+# loop throug all properties in json file to load them all to powershell
+if (Test-Path $configFile) {
+    $config = Get-Content -Path $configFile -Raw | ConvertFrom-Json
+
+    foreach ($property in $config.PSObject.Properties) {
+        $propertyName = $property.Name
+        $propertyValue = $property.Value
+
+        New-Variable -Name $propertyName -Value $propertyValue -Scope Global
+    }
+}
+
+
+##################################
+####  -- Odoo configuration  --  #
+##################################
+
 function scaffold {
 	<#
 	This is a simplify for odoo scaffold commands.
