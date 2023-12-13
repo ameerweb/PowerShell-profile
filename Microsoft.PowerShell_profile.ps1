@@ -32,9 +32,9 @@ function ~ { Set-Location ~ }
 function d { Set-Location c:\users\ameer\Desktop }
 function dd { Set-Location C:\Users\ameer\Documents\ }
 
-##################################
-####    --  CONFIG FILE  --  #####
-##################################
+####################################
+####    --  CONFIG FILE  --    #####
+####################################
 $configFile = "C:\Users\ameer\Documents\MEGAsync\Powershell\config.json"
 
 <#
@@ -82,13 +82,14 @@ if (Test-Path $configFile) {
 }
 
 
-##################################
-####  -- Odoo configuration  --  #
-##################################
+#########################################
+####    -- Odoo configuration  --    ####
+#########################################
 
 function scaffold {
 	<#
 	This is a simplify for odoo scaffold commands.
+	Usage scaffold 16 module_name
 	#>
 	param(
 		[Parameter()]
@@ -108,26 +109,11 @@ function scaffold {
 	}
 	
 }
-function pull_odoo {
-	<#
-	This function is to pull the code uodates from github.
-	#>
-	param(
-		[Parameter()]
-		[string]$odoo_version)
 
-
-	if (($odoo_version -ne "") -and ($null -ne $odoo_version)) {
-		Write-Output "================odoo-$odoo_version================"
-		git --git-dir=D:\odoo\odoo-$odoo_version\.git pull
-	}
-	else {
-		Write-Output "No odoo version set"
-	}
-}
 function uninstall_odoo {
 	<#
-	This function is to uninstall odoo module from command becouse there is no officail way in docummentation to do this
+	This function is to uninstall odoo module from command becouse there is no officail way in docummentation to do this.
+	Usage: uninstall_odoo 16 db_name module_name
 	#>
 	# TODO: Future update : use odoorpc may be helpfull.
 	param(
@@ -149,20 +135,16 @@ function uninstall_odoo {
 	}
 	
 }
-function fix_odoo {
+function fix_port {
 	<#
-	This function is to fix the port if it used by another service
-	if windows OSERROR access persmisions although the port not used. the follwong commands will be helpfull
-
-		#net stop winnat
-		#net start winnat
+	This function is to fix the port if it used by another service, if the port is not used by any service the the Windows NAT Driver (winnat) 
+	which is reserve ports for Windows use (even if Windows 10 isn't actually using them) so that no other programs on your computer can use these ports.
+	This appeae in windows update 2018.
+	Usage: fix_port 8016
 	#>
-	#TODO: This function need to be fixed
 	param(
 		[Parameter()]
-		[Int64]$odoo_version)
-		
-	$port = "80$odoo_version"
+		[Int64]$port)
 
 	$netstate = netstat -ano | findStr $port
 	
@@ -176,12 +158,14 @@ function fix_odoo {
 		}
 	}
 	else {
-		Write-Output "There is no process using port (8016) of odoo"
+		Restart-Service -Name winnat
+		Write-Output "There is no process using port (8016) of odoo, Restarting winnat Servise"
 	}
 }
 function run_odoo {
 	<#
 	This function is to run odoo directly from command prompt.
+	Usage: run_odoo 16 
 	#>
 	try {
 		if ($args.Length -eq 1) {
@@ -190,7 +174,7 @@ function run_odoo {
 		elseif ($args.Length -gt 1) {
 			$odoo_version = $args[0]
 			$kwargs = $args[1..($args.Length - 1)]
-			&"D:\odoo\odoo-$odoo_version\venv-odoo$odoo_version\Scripts\python.exe" D:\odoo\odoo-$odoo_version\odoo-bin -c D:\odoo\odoo-$odoo_version\odoo.conf $kwargs
+			&"D:\odoo\odoo-$odoo_version\venv-odoo$odoo_version\Scripts\python.exe" D:\odoo\odoo-$odoo_version\odoo-bin $kwargs
 		}
 		else {
 			Write-Host "enter the odoo version number followed by any anrguments you wnat"
@@ -200,6 +184,7 @@ function run_odoo {
 		Write-Host "Not Fount"
 	}
 };
+
 function ip_odoo {
 	<#
 	This function is to get the link to access odoo localy from local network,
@@ -225,8 +210,11 @@ function ip_odoo {
 	
 }
 
+#####################################
+####    -- Other Setting  --    ####
+#####################################
+
 function setIcon() {
-	
 	Set-Content -Path 'desktop.ini' -Value @"
 [.ShellClassInfo]
 ConfirmFileOp=0
