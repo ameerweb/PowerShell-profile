@@ -12,7 +12,9 @@ Set-PSReadLineOption -PredictionSource History
 # oh-my-posh:
 oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\montys.omp.json' | Invoke-Expression
 
-# Alias
+####################################
+#########  --   Alias  --  #########
+####################################
 New-Alias c clear
 New-Alias vim nvim
 New-Alias ll ls
@@ -21,11 +23,31 @@ New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
 New-Alias pn pnpm
 New-Alias grep findstr
 New-Alias wls Microsoft.PowerShell.Core\FileSystem::\\wsl.localhost\Debian
-
-#utitlties 
+####################################
+########  --  Utitlties  --  #######
+####################################
 function which ($command) {
 	Get-Command -Name $command -ErrorAction SilentlyContinue |
 	Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
+}
+function tail {
+	<#Unix equivalent Tail command#>
+	param (
+		
+		[Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [String]$tail,
+		[Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String]$path
+	)
+
+	if ($tail){
+		Get-Content $path -Tail ([Math]::Abs($tail))
+	}
+	else {
+		Get-Content $path
+	}
 }
 function lh { Get-ChildItem -ah }
 function ~ { Set-Location ~ }
