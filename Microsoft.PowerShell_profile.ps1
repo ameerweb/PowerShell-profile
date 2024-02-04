@@ -10,7 +10,7 @@ Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
 Set-PSReadLineOption -PredictionSource History
 
 # oh-my-posh:
-oh-my-posh init pwsh --config 'C:\Users\ameer\ps_themes\montys.omp.json' | Invoke-Expression
+oh-my-posh init pwsh --config 'C:\Users\ameer\Documents\PowerShell\montys.omp.json' | Invoke-Expression
 
 ####################################
 #########  --   Alias  --  #########
