@@ -23,6 +23,7 @@ New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
 New-Alias pn pnpm
 New-Alias grep findstr
 New-Alias wls Microsoft.PowerShell.Core\FileSystem::\\wsl.localhost\Debian
+New-Alias python3.9 C:\Users\ameer\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\python.exe
 ####################################
 ########  --  Utitlties  --  #######
 ####################################
@@ -247,4 +248,17 @@ FolderType=Videos
 "@
 	attrib +s +h 'desktop.ini'
 
+}
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
+function Remove-PyCache {
+    param (
+        [string]$Path = (Get-Location)
+    )
+
+    Get-ChildItem -Path $Path -Directory -Filter '__pycache__' -Recurse | ForEach-Object {
+        Remove-Item $_.FullName -Recurse -Force
+    }
 }
