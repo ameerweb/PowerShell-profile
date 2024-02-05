@@ -24,6 +24,11 @@ New-Alias pn pnpm
 New-Alias grep findstr
 New-Alias wls Microsoft.PowerShell.Core\FileSystem::\\wsl.localhost\Debian
 New-Alias python3.9 C:\Users\ameer\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\python.exe
+
+##### TODO: reorder the functions
+function gcg { git config --global @args }
+function gcl { git config --local @args }
+
 ####################################
 ########  --  Utitlties  --  #######
 ####################################
