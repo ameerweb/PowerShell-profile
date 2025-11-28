@@ -1,3 +1,11 @@
+v1.3.0
+ - Refactor Odoo functions into separate OdooFunctions.ps1 file for better organization
+ - Auto-load Odoo functions on profile startup
+ - Update directory naming convention from odoo-{version} to odoo{version}
+ - Change Odoo installation path from D:\ to C:\
+ - Add setup-odoo function to automate Odoo installation (git clone, venv, pip install)
+ - Support enterprise edition installation with -enterprise flag
+
 v1.2.0
  - Update README.md with setup instructions (Oh-My-Posh, Fonts, Terminal-Icons, PSReadLine).
  - Fix Oh-My-Posh initialization error (stale cache).
