@@ -1,0 +1,10 @@
+# Directories
+Modules/
+Help/
+
+# Temporary and Cache Files
+omp_init.ps1
+*.bak
+*~
+*.swp
+*.un~
