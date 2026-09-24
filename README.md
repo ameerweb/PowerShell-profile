@@ -5,6 +5,12 @@ prompt, Terminal-Icons, Emacs key bindings, history suggestions, aliases and
 Odoo helpers. Installed modules, downloaded help, caches and editor backups
 are intentionally excluded from Git.
 
+## Preview
+
+Here’s what your terminal will look like after completing the setup:
+
+![PowerShell terminal after setup](assets/terminal-preview.png)
+
 ## Set up a new Windows device
 
 ### 1. Install applications
