@@ -1,9 +1,11 @@
-# Directories
-Modules/
-Help/
+# Installed packages and downloaded help (install separately; see README.md)
+/Modules/
+/Help/
+/Scripts/
 
-# Temporary and Cache Files
-omp_init.ps1
+# Device-local configuration, generated prompt cache and editor backups
+/config.local.json
+/omp_init.ps1
 *.bak
 *~
 *.swp

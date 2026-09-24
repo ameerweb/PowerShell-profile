@@ -1,48 +1,20 @@
-Import-Module Terminal-Icons
-
-# PSReadLine 
-Set-PSReadLineOption -EditMode Emacs
-Set-PSReadLineOption -BellStyle None
-Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
-Set-PSReadLineOption -PredictionSource History
-
-# oh-my-posh configuration with caching
-$omp_config = 'C:\Users\ameer\Documents\PowerShell\montys.omp.json'
-$omp_cache = 'C:\Users\ameer\Documents\PowerShell\omp_init.ps1'
-
-if (Test-Path $omp_config) {
-	$omp_bin = (Get-Command oh-my-posh -ErrorAction SilentlyContinue | Select-Object -First 1).Source
-	$cache_valid = (Test-Path $omp_cache) -and (Get-Item $omp_cache).LastWriteTime -gt (Get-Item $omp_config).LastWriteTime
-    
-	if ($omp_bin -and $cache_valid) {
-		$cache_valid = (Get-Item $omp_cache).LastWriteTime -gt (Get-Item $omp_bin).LastWriteTime
-	}
-
-	if ($cache_valid) {
-		. $omp_cache
-	}
-	else {
-		# Generate init script and cache it
-		oh-my-posh init pwsh --config $omp_config --print | Set-Content $omp_cache
-		. $omp_cache
-	}
-}
-else {
-	Write-Warning "Oh-My-Posh config not found at $omp_config"
-}
-
+# PowerShell 7 profile. Helpers remain available to scripts and coding agents.
+# Terminal-only features below are skipped for redirected and command sessions.
 ####################################
 #########  --   Alias  --  #########
 ####################################
-New-Alias c clear
-New-Alias vim nvim
-New-Alias ll ls
-New-Alias tig 'C:\Program Files\Git\usr\bin\tig.exe'
-New-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
-New-Alias pn pnpm
-New-Alias grep findstr
-New-Alias wls Microsoft.PowerShell.Core\FileSystem::\\wsl.localhost\Debian
-New-Alias python3.9 C:\Users\ameer\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\python.exe
+Set-Alias c clear
+Set-Alias vim nvim
+Set-Alias ll ls
+Set-Alias tig 'C:\Program Files\Git\usr\bin\tig.exe'
+Set-Alias less 'C:\Program Files\Git\usr\bin\less.exe'
+Set-Alias pn pnpm
+Set-Alias grep findstr
+function wls { Set-Location -LiteralPath '\\wsl.localhost\Debian' }
+$legacyPython = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\python.exe'
+if (Test-Path -LiteralPath $legacyPython -PathType Leaf) {
+    Set-Alias python3.9 $legacyPython
+}
 
 ####################################
 ########  --  Utitlties  --  #######
@@ -75,13 +47,18 @@ function tail {
 }
 function lh { Get-ChildItem -ah }
 function ~ { Set-Location ~ }
-function d { Set-Location c:\users\ameer\Desktop }
-function dd { Set-Location C:\Users\ameer\Documents\ }
+function d { Set-Location -LiteralPath ([Environment]::GetFolderPath('Desktop')) }
+function dd { Set-Location -LiteralPath ([Environment]::GetFolderPath('MyDocuments')) }
 
 ####################################
 ####    --  CONFIG FILE  --    #####
 ####################################
-$configFile = "C:\Users\ameer\Documents\MEGAsync\Powershell\config.json"
+# Prefer an ignored, device-local file; retain the existing MEGAsync fallback.
+$configFile = Join-Path $PSScriptRoot 'config.local.json'
+$legacyConfigFile = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'MEGAsync\Powershell\config.json'
+if (-not (Test-Path -LiteralPath $configFile) -and (Test-Path -LiteralPath $legacyConfigFile)) {
+    $configFile = $legacyConfigFile
+}
 
 <#
 This Function is used to add any custom key value to $configFile key value, So i can permanent save them to use them later.
@@ -123,7 +100,7 @@ if (Test-Path $configFile) {
 		$propertyName = $property.Name
 		$propertyValue = $property.Value
 
-		New-Variable -Name $propertyName -Value $propertyValue -Scope Global
+		Set-Variable -Name $propertyName -Value $propertyValue -Scope Global
 	}
 }
 
@@ -132,15 +109,11 @@ if (Test-Path $configFile) {
 #########################################
 
 # Auto-load Odoo functions
-$odooFunctionsPath = Join-Path $HOME "Documents\PowerShell\OdooFunctions.ps1"
+$odooFunctionsPath = Join-Path $PSScriptRoot 'OdooFunctions.ps1'
 if (Test-Path $odooFunctionsPath) {
 	. $odooFunctionsPath
 }
 
-$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-if (Test-Path($ChocolateyProfile)) {
-	Import-Module "$ChocolateyProfile"
-}
 function Remove-PyCache {
 	param (
 		[string]$Path = (Get-Location)
@@ -149,4 +122,47 @@ function Remove-PyCache {
 	Get-ChildItem -Path $Path -Directory -Filter '__pycache__' -Recurse | ForEach-Object {
 		Remove-Item $_.FullName -Recurse -Force
 	}
+}
+
+# Only initialize prompt decoration and keyboard editing in an interactive VT
+# console. -Command/-File sessions can have a TTY too, so check launch arguments.
+$profileCommandSession = [Environment]::GetCommandLineArgs() | Where-Object {
+    $_ -match '^-(noni|c(?:o|$)|f(?:i|$)|e(?:c|n|$))'
+}
+$profileInteractive = $Host.Name -eq 'ConsoleHost' -and
+    $Host.UI.SupportsVirtualTerminal -and
+    -not [Console]::IsOutputRedirected -and
+    -not [Console]::IsInputRedirected -and
+    -not $profileCommandSession
+
+if (-not $profileInteractive) { return }
+
+# Optional modules: a fresh clone still starts before setup is completed.
+if (Get-Module -ListAvailable -Name PSReadLine) {
+    Import-Module PSReadLine
+    Set-PSReadLineOption -EditMode Emacs -BellStyle None
+    Set-PSReadLineKeyHandler -Chord 'Ctrl+d' -Function DeleteChar
+    # PredictionSource was introduced in PSReadLine 2.1.
+    if ((Get-Command Set-PSReadLineOption).Parameters.ContainsKey('PredictionSource')) {
+        Set-PSReadLineOption -PredictionSource History
+    }
+}
+
+if (Get-Module -ListAvailable -Name Terminal-Icons) {
+    Import-Module Terminal-Icons
+}
+
+if ($env:ChocolateyInstall) {
+    $ChocolateyProfile = Join-Path $env:ChocolateyInstall 'helpers\chocolateyProfile.psm1'
+    if (Test-Path -LiteralPath $ChocolateyProfile -PathType Leaf) {
+        Import-Module $ChocolateyProfile
+    }
+}
+
+# Use the executable's own initialization/cache. The old omp_init.ps1 wrapper
+# stored an absolute path and session ID, and could outlive its generated script.
+$ompConfig = Join-Path $PSScriptRoot 'montys.omp.json'
+$ompCommand = Get-Command oh-my-posh -CommandType Application -ErrorAction SilentlyContinue
+if ($ompCommand -and (Test-Path -LiteralPath $ompConfig -PathType Leaf)) {
+    & $ompCommand.Source init pwsh --config $ompConfig | Invoke-Expression
 }
